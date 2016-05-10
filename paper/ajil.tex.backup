@@ -1,0 +1,116 @@
+\documentclass[times, 10pt,twocolumn]{article} 
+\usepackage{dsn}
+\usepackage{times}
+\usepackage{url}
+\usepackage{amsfonts,amsthm,amsmath}
+
+\usepackage{graphicx}
+\usepackage[noend]{algorithmic}
+\usepackage[boxed]{algorithm}
+\algsetup{indent=1.5em}
+
+\newtheorem*{theorem}{Theorem}
+\newtheorem*{claim}{Claim}
+
+\newcommand{\sysname}{\textsc{Ajil}}
+
+%------------------------------------------------------------------------- 
+% take the % away on next line to produce the final camera-ready version 
+%\pagestyle{empty}
+
+%------------------------------------------------------------------------- 
+\begin{document}
+
+\title{Ajil: Distributed Rate-limiting for Multicast Networks}
+
+\author{Hussam Abu-Libdeh, Ymir Vigfusson, Ken Birman\\
+\textit{Department of Computer Science}\\
+\textit{Cornell University, Ithaca, NY 14853}\\
+\{hussam, vigfusson, ken\}@cs.cornell.edu\\
+% For a paper whose authors are all at the same institution, 
+% omit the following lines up until the closing ``}''.
+% Additional authors and addresses can be added with ``\and'', 
+% just like the second author.
+\and
+Mahesh Balakrishnan\\
+\textit{Microsoft Research}\\
+\textit{Mountain View, CA 94043}\\
+maheshba@microsoft.com\\
+}
+
+\maketitle
+\thispagestyle{empty}
+
+\begin{abstract}
+Multicast traffic patterns play a key role in dependable data centers, arising when data is replicated and distributed over multiple machines for fault-tolerance and availability. Such settings involve large numbers of multicast groups as well as multiple senders to each group --- a single system can have hundreds of such multicast channels. Without effective multi-channel rate control, multicast senders cannot determine the right rate to send data at and often transmit to groups as fast as possible. As a result, multicast channels are subject to traffic spikes that can overload individual end-hosts within the data center as well as its communication backplane. This paper introduces \sysname{}, a distributed rate-limiting protocol for data centers. \sysname{} enforces a system-wide quota on multicast traffic, and also facilitates equitable distribution of this quota ensures across all the multicast channels in the data center.
+\end{abstract}
+
+
+
+%------------------------------------------------------------------------- 
+\Section{Introduction}
+
+%Multicast is important for dependable systems --- especially with lots of channels
+Multicast is key to building dependable data center systems, enabling the replication of data and functionality over multiple machines for fault-tolerance and availability. In such settings, multicast usage is characterized by large numbers of groups in the system, as well as many different senders transmitting data to each group --- in essence, hundreds of channels between individual senders and groups of receivers.
+
+%without rate control, multicast makes systems less dependable
+Unfortunately, multicast rate control in clustered settings is a black art. Senders in a multi-channel setting have no way to determine the right rate to transmit at, and often default to sending data as fast as possible. As a result, systems that use multicast heavily are extremely vulnerable to `black-outs' resulting from disruptive traffic spikes. Multicast channels can interfere with each other as well as other unicast traffic, overloading both end-hosts and the data center switching fabric.
+
+%hence the need for ajil
+This paper presents \sysname{}, a distributed rate-limiting protocol for data centers. \sysname{} has two goals: First, it establishes a soft global bandwidth limit on the aggregate multicast traffic in the system such that it is not breached severely. Second, it enables equitable division of this bandwidth limit across multiple groups and senders in the system. \sysname{} achieves these goals through a decentralized protocol in which senders use local information representing a partial state of the system to make global decisions on whether they should ramp up or back off their sending speeds. These local estimate are obtained through a broadcast control channel on which receivers periodically and probabilistically transmit information about traffic rates in different groups.
+
+We evaluate a simulation of \sysname{} and demonstrate that it can be used to effectively enforce a soft bandwidth limit in a multi-group setting, and equitably divide this limit across multiple groups as well as multiple senders to each group. The rest of the paper is organized as follows: we outline the problem statement in Section \ref{sec:probstat}, we describe the operation of the \sysname{} protocol in Section \ref{sec:protocol}, describe the policies it supports in Section \ref{sec:policy} and evaluate a simulation in Section \ref{sec:eval}. After a discussion of related work in Section \ref{sec:related} and future work in Section \ref{sec:future}, we conclude in Section \ref{sec:conclusion}.
+
+%------------------------------------------------------------------------- 
+\Section{Problem Statement} \label{sec:probstat}
+
+\input{spec.tex}
+
+
+%------------------------------------------------------------------------- 
+\Section{The Ajil Protocol} \label{sec:protocol}
+
+\input{protocol.tex}
+
+
+%------------------------------------------------------------------------- 
+\Section{Policy} \label{sec:policy}
+
+\input{policy.tex}
+
+
+%------------------------------------------------------------------------- 
+\Section{Simulation and Experimental Results	} \label{sec:eval}
+
+\input{eval.tex}
+
+%------------------------------------------------------------------------- 
+\Section{Related Work} \label{sec:related}
+
+A large body of work examines multicast flow control within single groups on the wide area network. A primary challenge in the WAN is the heterogeneous nature of receiver network capacities \cite{gau2002mfc}. One important approach used specifically for video or audio multicast is \textit{layering} \cite{Mccanne96layered, bhattacharyya1998emf, vicisano98tlc}, where a single multicast channel is divided up into multiple separate groups, each transmitting a stripe of the data; receivers can join a subset of these groups to receive data at a specific resolution. \sysname{} differs from these schemes in three important ways --- it's designed for data centers and not a heterogeneous WAN, it is aimed at data that cannot be sent at multiple resolutions, and it looks to enforce a maximum data rate across multiple groups and senders.
+
+In clustered settings, flow control is commonly found as a component in group communication systems --- for example, in the Isis \cite{birman1993pga}, Horus \cite{vanrenesse1996hfg} and Totem \cite{moser1996tft} systems. The challenge for these protocols is usually to avoid overloading individual receivers in the group. In contrast to these approaches, \sysname{} seeks to limit aggregate multicast usage across multiple groups within a data center.
+
+\cite{mcmd}
+\cite{ricochet}
+\cite{sigcomm}
+
+
+\section{Future Work} \label{sec:future}
+
+Our immediate focus is on implementing \sysname{} and evaluating it on a real data center testbed. We are looking to obtain additional real traces of data center multicast usage --- group sizes, numbers of senders, and traffic rates --- in order to better understand how \sysname{} behaves in different settings. 
+
+An important avenue of future research involves prioritizing certain channels over others; for example, in an e-commerce setting, we'd prefer slowing down a group used by a background maintenance application instead of a high-value group dedicated to credit card transactions. Additionally, we'd like to explore the possibility of having \sysname{} enforce `hard' limits on bandwidth usage that should never be violated, as opposed to soft limits that can be violated momentarily.
+
+
+%------------------------------------------------------------------------- 
+\Section{Conclusion} \label{sec:conclusion}
+
+Multicast can play a crucial role in speeding up dependable applications; yet, it is largely underutilized in modern data centers due to the absence of effective mechanisms for limiting its impact on the network. \sysname{} is a simple, decentralized rate limiting protocol that allows data center administrators to place a global bandwidth limit on multicast traffic. Further, \sysname{} distributes this bandwidth limit equitably across the multiple groups within the data center, as well as the different senders to each group.
+	
+%------------------------------------------------------------------------- 
+\bibliographystyle{dsn}
+\bibliography{ajil}
+
+\end{document}
+

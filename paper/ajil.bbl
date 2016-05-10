@@ -1,0 +1,60 @@
+\begin{thebibliography}{10}\setlength{\itemsep}{-1ex}\small
+
+\bibitem{websphere}
+{IBM WebSphere}.
+\newblock \url{http://www-01.ibm.com/software/webservers/appserv/was/}, 2008.
+
+\bibitem{ricochet}
+M.~Balakrishnan, K.~Birman, A.~Phanishayee, and S.~Pleisch.
+\newblock Ricochet: Lateral error correction for time-critical multicast.
+\newblock In {\em NSDI}, 2007.
+
+\bibitem{bhattacharyya1998emf}
+S.~Bhattacharyya, J.~Kurose, D.~Towsley, and R.~Nagarajan.
+\newblock {Efficient multicast flow control using multiple multicast groups}.
+\newblock In {\em IEEE INFOCOM}, volume~98, 1998.
+
+\bibitem{birman1993pga}
+K.~Birman.
+\newblock {The process group approach to reliable distributed computing}.
+\newblock {\em Communications of the ACM}, 36(12):37--53, 1993.
+
+\bibitem{sallysrm}
+S.~Floyd, V.~Jacobson, C.-G. Liu, S.~McCanne, and L.~Zhang.
+\newblock A reliable multicast framework for light-weight sessions and
+  application level framing.
+\newblock {\em IEEE/ACM Trans. Netw.}, 5(6):784--803, 1997.
+
+\bibitem{gau2002mfc}
+R.~Gau, Z.~Haas, and B.~Krishnamachari.
+\newblock {On multicast flow control for heterogeneous receivers}.
+\newblock {\em Networking, IEEE/ACM Transactions on}, 10(1):86--101, 2002.
+
+\bibitem{Mccanne96layered}
+S.~Mccanne, V.~Jacobson, and M.~Vetterli.
+\newblock Receiver-driven layered multicast.
+\newblock In {\em ACM SIGCOMM}, pages 117--130, 1996.
+
+\bibitem{moser1996tft}
+L.~Moser, P.~Melliar-Smith, D.~Agarwal, R.~Budhia, and C.~Lingley-Papadopoulos.
+\newblock {Totem: a fault-tolerant multicast group communication system}.
+\newblock {\em Communications of the ACM}, 39(4):54--63, 1996.
+
+\bibitem{vanrenesse1996hfg}
+R.~van Renesse, K.~Birman, and S.~Maffeis.
+\newblock {Horus: a flexible group communication system}.
+\newblock {\em Communications of the ACM}, 39(4):76--83, 1996.
+
+\bibitem{vicisano98tlc}
+L.~Vicisano, J.~Crowcroft, and L.~Rizzo.
+\newblock {TCP-like congestion control for layered multicast data transfer}.
+\newblock In {\em INFOCOM'98. Seventeenth Annual Joint Conference of the IEEE
+  Computer and Communications Societies. Proceedings. IEEE}, volume~3.
+
+\bibitem{mcmd}
+Y.~Vigfusson, H.~Abu-Libdeh, M.~Balakrishnan, K.~Birman, and Y.~Tock.
+\newblock {Dr.~Multicast: Rx for Data Center Communication Scalability}.
+\newblock \url{http://www.cs.cornell.edu/projects/quicksilver/pubs.html},
+  October 2008.
+
+\end{thebibliography}

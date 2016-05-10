@@ -1,0 +1,6 @@
+#!/bin/bash
+export DRMC_ADDRESS=127.0.0.1
+export DRMC_PORT=3178
+export DRMC_UDP_REPEAT=2
+export DRMC_DELTA=20
+LD_PRELOAD=./ajillib.so $@

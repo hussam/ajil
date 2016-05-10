@@ -1,0 +1,32 @@
+Services in data centers are often provided by collections of nodes running a single application or a suite of applications. To avoid communication black-outs, a network administrator can impose an aggregate multicast limit $L$ in her data center. Assume that $\{n_1 ... n_N\}$ is the set of processes (nodes) in the system, and $\{G_1 ... G_M\}$ be the set of multicast groups in use. Let $r_j(t)$ denote the multicast traffic rate of group $G_j$ at time $t$.
+
+Our goal is to maintain that:
+\[ \forall t:\ \sum_{j = 1}^{M} r_j(t) \leq L\]
+
+\subsection{A Trivial Approach}
+We can trivially achieve our goal by dividing the allowed multicast bandwidth equally across all the groups and all the senders in each group; that is by hand-wiring that
+\begin{eqnarray*}
+\forall t, \forall j: r_j(t) &=& \frac{L}{M}
+\end{eqnarray*}
+
+However, this quota allotment is hard to achieve in systems where the number of groups and members of each group are only known at run-time. Additionally, equal division of the quota might not be optimal because of unequal multicast demands of different nodes and groups. For this reason, we need a protocol to dynamically assign bandwidth quotas to multicast channels based on demand.
+
+\subsection{Why not TCP?}
+TCP is the \textit{de facto} standard for flow and congestion control in practically any kind of network. It uses a simple, decentralized mechanism to ensure that bottleneck bandwidth in a network is equitably distributed across all the unicast flows traversing it.
+
+Clearly, data center operators concerned about flow control could use TCP as the basis of a multicast protocol in the manner of enterprise service bus solutions such as the Java Messaging Service (a popular client-server style of messaging system).  However, in such approaches all messages must pass through the server, which becomes a bottleneck and single point of failure.
+
+Once we accept that direct host-to-host multicast might be preferable, one can still ask whether a direct mapping of the TCP flow control and congestion protocol could solve our multicast problem. Comparing our requirements to TCP sheds light on the nature of a possible solution:\\
+
+\begin{itemize}
+\item{TCP is a window-based protocol --- each sender maintains a window of packets sent but not yet acknowledged by the receiver, and only sends more packets when current packets in the window are acknowledged and removed from it. Such a scheme does not work very well for multicast, since it requires each receiver to send back acknowledgments to the sender, an approach that does not scale well with the number of receivers in a group. Instead, we need a protocol that assigns a sending rate to each node for every group it is transmitting to, and varies this rate over time to control the amount of traffic in the system.}
+\item{TCP is designed to prevent congestion collapse in networks, and uses packet loss as a signal of congestion. We would like to enforce an administratively defined limit on multicast bandwidth usage, and packet loss does not necessarily occur when this limit is breached; as a result, it is not a valid signal for limit violation.}
+\item{Packet loss is a 1-bit signal intrinsically tied to network congestion. To impose an arbitrary bandwidth limit within a data center, we need a more complex signal that tells us when the limit is crossed as well as the senders and groups primary responsible. One such signal is an estimate of the aggregate traffic rate within the system, along with a per-channel breakdown.}
+\end{itemize}
+
+Accordingly, we need a solution that assigns sending rates to each multicast channel in the system (i.e, to each sender, for every group it is sending to), and determines this rate locally at each sender by observing a system-wide estimate of traffic. Our assumptions of the operating environment for this solution are as follows:
+\begin{itemize}
+\item{Nodes are expected to follow the protocol and not behave maliciously. We do assume benign fail-stop faults.}
+\item{The clocks of individual nodes in the system are synchronized with each other. In practice, it is possible to achieve sub-millisecond clock synchronization within data centers.}
+\item{The data center network is expected to provide a broadcast capability to nodes.}
+\end{itemize}

@@ -1,0 +1,41 @@
+\subsection{Ymir's thoughts}
+
+\begin{itemize}
+\item
+ I don't know yet what the best ordering is for this material. Should policy be introduced in a general fashion before
+  presenting the protocol, or should the protocol be displayed and the policy section explains its flexibility?
+\item
+ Put examples of how the reaction domain could be specified, while representing some policy that 'makes sense'.
+  For instance, "Tax everybody equally", and "Tax richest nodes in the group that has most traffic".
+\item
+ The time duration for the drop/delay policy is unspecified yet. There are two or three different approaches that make sense.
+  One is to keep it as it is and be totally agnostic. 
+  Second is to gradually decrease the limit using an exponential average
+  as with the gamma parameter. This will behave a lot like TCP, always trying to be close to L. The key point here is that
+  we don't really know the demand, we just predict it from previous usage of multicast. Thus if a lot of people leave, of
+  course the others should be allowed to increase their multicast traffic rates.
+  Third option is to change the monitor code slightly so we report rate and 'desired rate' of each group, meaning how fast
+  the group would want to be if it didn't have to slow down.
+  Then we can evaluate the policy for reaction when the /desired limit/ reaches the 95\% of L mark, otherwise allow everybody
+  to send as fast as they want. Desired rate would be calculated by interpolating the current amount of bytes or packets 
+  a node wanted to send (whether or not they were dropped) versus the time spent sending, and not spent waiting (in case 
+  they were delayed). 
+  Fourth option is to have the time decay thing so that we tenure delays that have been happening for a long time. I don't
+  really know what would be a good recovery or an implementation of this approach, so I think we should try something else.
+  Three sounds best to me, and the second option might also work.
+\item
+  We need to capture some notion of how fast rates are changing, like Hussam and I have been talking about.
+  Ideally, we'd like to be able to say something like "assuming rates cannot more than double during one epoch", and
+  deduce that we can respond fast to that. This also means that epoch sizes need to be non-trivial, otherwise they're very
+  choppy. It may be worth it to look at the burstiness of various protocols, maybe if there's something on SRM, to see what
+  rates are reasonable and recommend a good value of E. 
+
+\item 
+  Try to make sure that the 'criticial threshold' thing is clear. We have a limit $L$ that should never be exceeded. 
+  We use $L/c$ of the traffic on average for broadcast channel traffic. That gives $(1-\frac{1}{c})L$ of remaining 
+  bandwidth. We define a critical threshold to be something like $0.95 L$, or the point at which there is a crisis,
+  so it needs to be clear what $L$ we are referring to here. Should this 95\% be configurable? If it is, you need to
+  bind it to the rate at which rates change (yeah, that's the rate of a rate) -- if things can change fast, you need
+  a bigger cushion. Perhaps you can move this responsibility on to the administrator and just tell him what it does.
+
+\end{itemize}

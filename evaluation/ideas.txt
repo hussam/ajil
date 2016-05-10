@@ -1,0 +1,23 @@
+Ideas for evaluation
+--------------------
+
+Ymir:
+   - Fairness (groups/senders want vs. allotted)
+   - Responsiveness (how fast does it react to crisis)
+   - Correctness (is the limit obeyed)
+
+Mahesh:
+   - Obeying the limit with different alpha, beta, C params
+   - Group fairness with the different params
+   - Sender fairness with the different params
+
+*****
+
+Plotting Ideas:
+   Fairness Scatter Plot,
+      x-axis is the group #
+      y-axis is the fairness fraction (allotted/want)
+      it should look like a line since they all should be the same
+
+   Fairness CDF,
+      95% of groups have a fairness fraction between 0.8 and 0.9

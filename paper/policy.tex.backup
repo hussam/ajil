@@ -1,0 +1,82 @@
+The \sysname{} protocol allows the network administrator to specify an acceptable-use-policy (AUP) to govern multicast traffic in her network. The AUP is specified in terms of the protocol's parameters and a slowdown policy to be implemented when the aggregate rate-limit is exceeded.
+
+\subsection{Protocol Parameters}
+The network administrator specifies values for the following parameters governing the protocol's performance:
+\begin{itemize}
+\item The aggregate rate-limit \(\mbox{\boldmath $L$}\).
+\item An epoch size (window length). This will determine how often is the monitor checked and how quick does the protocol react to aggregate limit violations.
+\item The monitor broadcast fraction \(\mbox{\boldmath $c$}\) set to a value between 0 and 1. As discussed previously, this governs the frequency of traffic reports sent by the monitor on the broadcast channel. Traffic reports for group $G_j$ are sent at a rate proportional to $c \cdot r_j$. For example, $c=0.01$ means that for every 100 packets sent on that group, a single traffic report will be sent (in expectation).
+\item Reaction domain parameters:
+	\begin{itemize}
+	\item \(\mbox{\boldmath $\alpha$}\): the fraction of the top-sending groups that will be included in the reaction domain. This parameter should be given a value between 0 and 1, where 1 indicates all the groups and 0 is specially reserved for the single highest sending group.
+	\item \(\mbox{\boldmath $\beta$}\): the fraction of the top-sending nodes within the top-sending groups to be included in the reaction domain. This parameter should be set to a value between 0 and 1 as well with the same meaning as before.
+	\end{itemize}
+\end{itemize}
+
+\subsection{Slowdown Policy}
+The network administrator also specifies a \textit{slowdown} policy governing how a violation of the aggregate limit is handled. The slowdown policy is implemented by the nodes that are in the reaction domain. The slowdown policy can be defined as any number of things for example:
+
+\begin{itemize}
+\item \textbf{Flat Tax:} each node slows its sending rate by some constant KBps.
+\item \textbf{Local Percentage:} each nodes slows down by some percentage.
+\item \textbf{Global Percentage:} each node slows down proportional to the global excess over the aggregate limit.
+\end{itemize}
+
+Our evaluation showed that fairness is best achieved when nodes are slowed down proportionally to their transmission rate following the global percentage scheme above.
+
+The actual implementation of a ``slowdown'' is left for implementation, and can be part of the policy itself. For example, a slowdown can be implemented as any of the following:
+\begin{itemize}
+\item \emph{Drop} packets --- This policy suits applications that do not require 100\% reliability from the transport layer, either running their own application-level reliability protocols or sending data that is intrinsically tolerant of some loss.
+\item \emph{Delay} each outgoing packet --- For applications that require a reliable transport layer, \sysname{} can delay packets at send-side buffers instead of dropping them.
+\end{itemize}
+
+Changes made to the policy parameters by an administrator are propagated by broadcasting on the shared channel.
+
+\subsection{Slowdown Policy Application}
+\sysname{}'s rate control policies are a superset of TCP/IP's AIMD curve; with the local and global percentage policies, \sysname{} supports an MIMD (Multiplicative Increase Multiplicative Decrease) curve, whereas with the flat tax policy, it supports an AIAD policy (Arithmetic Decrease Arithmetic Increase).
+
+For MIMD policies, a ``slowdown multiplier'' is initialized to 1 when the slowdown is first initiated. In each epoch while the slowdown policy is activated, the bandwidth quota is slashed at a minimum by a ``multiplier'' factor of the amount dictated by the policy. Opportunistically, nodes check whether cutting the quota by half the multiplier factor of the amount dictated by policy will not exceed the global bandwidth limit according to the information gathered by the node's monitor. If the latter is the case, then that option is followed, and the multiplier is set to half its value for the subsequent epochs. Otherwise, the quota is cut down by the first amount and the multiplier is kept at its current value.
+
+For example, in the first epoch of a slowdown, the node tests whether it should slowdown by the full amount dictated by policy or half of it. If slowing down by half the amount is possible, then the multiplier is set to 0.5 and later epochs test whether they could minimize that deduction any further. With this mechanism, nodes stop slowing down when the multiplier reachers a sufficiently low value.
+
+\begin{algorithm}[t]
+Monitor:
+\begin{algorithmic}[1]
+\STATE listen for incoming traffic broadcasts
+\FORALL {$G_j$ \textbf{in} joined groups}
+   \STATE {$r_j \gets$ locally-seen traffic rate}
+   \IF { rand() $\leq c \cdot \frac{r_j}{|G_j|}$ }
+         \STATE \verb|broadcast|($r_j$)
+   \ENDIF
+\ENDFOR
+\end{algorithmic}
+
+\medskip
+Reactor:
+\begin{algorithmic}[1]
+\STATE sort groups by traffic
+\IF {$G_j$'s sorted index $\leq \lceil \alpha \cdot M \rceil$}
+   \STATE sort members of $G_j$ by traffic
+   \IF {my sorted index $\leq \lceil \beta \cdot |G_j| \rceil$}
+      \STATE multiplier $\gets 1$
+      \STATE apply \verb|slowdown()|
+   \ENDIF
+\ENDIF
+\end{algorithmic}
+
+\medskip
+Slowdown:
+\begin{algorithmic}[1]
+\IF {total traffic using multiplier/2 $\leq L$}
+   \STATE multiplier $\gets$ multiplier/2
+\ENDIF
+
+\STATE quota $\gets$ \verb|slowdown_policy| * multiplier/2
+
+\IF {multiplier $< 0.001$}
+   \STATE stop slowing down
+\ENDIF
+\end{algorithmic}
+\floatname{algorithm}{Pseudocode}
+\caption{Pseudocode for the \sysname{} protocol.}
+\end{algorithm}

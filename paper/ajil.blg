@@ -1,0 +1,48 @@
+This is BibTeX, Version 0.99c (Web2C 7.5.6)
+The top-level auxiliary file: ajil.aux
+The style file: dsn.bst
+Database file #1: ajil.bib
+Warning--to sort, need author or key in websphere
+Warning--empty year in vicisano98tlc
+You've used 11 entries,
+            2118 wiz_defined-function locations,
+            563 strings with 5574 characters,
+and the built_in function-call counts, 3816 in all, are:
+= -- 355
+> -- 210
+< -- 3
++ -- 84
+- -- 72
+* -- 287
+:= -- 631
+add.period$ -- 32
+call.type$ -- 11
+change.case$ -- 69
+chr.to.int$ -- 0
+cite$ -- 13
+duplicate$ -- 134
+empty$ -- 299
+format.name$ -- 72
+if$ -- 785
+int.to.chr$ -- 0
+int.to.str$ -- 11
+missing$ -- 9
+newline$ -- 57
+num.names$ -- 20
+pop$ -- 83
+preamble$ -- 1
+purify$ -- 58
+quote$ -- 0
+skip$ -- 90
+stack$ -- 0
+substring$ -- 192
+swap$ -- 26
+text.length$ -- 3
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 44
+warning$ -- 2
+while$ -- 33
+width$ -- 13
+write$ -- 117
+(There were 2 warnings)

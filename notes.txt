@@ -1,0 +1,9 @@
+- 12/25/2009:
+	I had previously only considered limiting the amount of traffic put on the
+	wire by senders without taking the size of receiver groups into consideration.
+	I now believe this is erroneous because this does not accurately reflect the
+	amount of total traffic induced in the network due to multicast operations.
+	Ultimately, that is what we need to limit. Thus, a sender that sends 150K of
+	traffic to a group of 5 receivers is less harmful than a sender that
+	100K of traffic to a group of 10 receivers. Rate limiting should happen
+	accordingly.

@@ -1,0 +1,25 @@
+High-level Goal
+----------------
+We aim to minimize the number of messages dropped between senders and receivers
+without sacrificing throughput in multi-group communication settings such as
+modern cloud-computing data centers.
+
+Model Details
+--------------
+Nodes are assembled into overlapping groups. Each group member can be either a
+sender, a receiver, or both. The goal of the communication substrate is to
+maximize throughput and minimize packet loss. Senders and receivers communicate
+"normally" via a light-weight best-effort group communication protocol such as
+IP Multicast. However, senders and receivers have conflicting goals: Senders
+aim to send at the maximum message rate to the largest number of receivers.
+On the other hand, receivers have a set limit on the aggregate multicast
+traffic rate they can accomodate beyond which packet loss may occur. The
+receivers' rate limits may not be known a priori to senders.
+
+If a receiver's receiving rate is below a certain group's threshold, it is
+switched to communicating via TCP unicast with one or more of the senders in its
+group. Additionally, senders maintain lists of their multicast recipients.
+Senders have to balance their multicast rate against the number of multicast
+receivers. In general, senders optimize for: (multicast message rate * number of multicast members).
+Given the conflicting utility functions for senders and receivers, a single
+optimal sending strategy may not be always obvious.
